@@ -8,6 +8,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+
+  double inches = 0.0;
+  double result = 0.0;
+  String _resultReading = '';
+  String _finalResult = '';
+
+  void _calculateBMI() {
+    setState(() {
+      int age = int.parse(_ageController.text);
+      double height = double.parse(_heightController.text);
+      inches = height * 12;
+      double weight = double.parse(_weightController.text);
+
+      if ((_ageController.text.isNotEmpty || age > 0) &&
+          ((_heightController.text.isNotEmpty || inches > 0) &&
+              (_weightController.text.isNotEmpty || weight > 0))) {
+        result = weight / (inches * inches) * 703; // our BMI
+
+        //Do the reading
+        if (double.parse(result.toStringAsFixed(1)) < 18.5) {
+          _resultReading = "Underweight";
+        } else if (double.parse(result.toStringAsFixed(1)) >= 18.5 &&
+            result < 25) {
+          _resultReading = "Great Shape!"; // Normal
+
+        } else if (double.parse(result.toStringAsFixed(1)) >= 25.0 &&
+            result < 30) {
+          _resultReading = "Overweight";
+        } else if (double.parse(result.toStringAsFixed(1)) >= 30.0) {
+          _resultReading = "Obese";
+        }
+      } else {
+        result = 0.0;
+      }
+    });
+    _finalResult = "Your BMI: ${result.toStringAsFixed(1)}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,28 +73,28 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.grey.shade300,
               child: Column(
                 children: [
-                  const TextField(
-                    cursorColor: null,
+                  TextField(
+                    controller: _ageController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Age',
                       hintText: 'e.g: 34',
                       icon: Icon(Icons.person_outline),
                     ),
                   ),
-                  const TextField(
-                    cursorColor: null,
+                  TextField(
+                    controller: _heightController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Height in Feet',
                       hintText: 'e.g: 5.6',
                       icon: Icon(Icons.insert_chart),
                     ),
                   ),
-                  const TextField(
-                    cursorColor: null,
+                  TextField(
+                    controller: _weightController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Weight in lbs',
                       hintText: 'e.g: 180 ',
                       icon: Icon(Icons.line_weight),
@@ -65,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     alignment: Alignment.center,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: _calculateBMI,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pinkAccent,
                         elevation: 0,
@@ -82,22 +123,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Column(
-              children: const [
+              children: [
                 Text(
-                  'BMI: ',
-                  style: TextStyle(
+                  _finalResult,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                     color: Colors.blueAccent,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(5),
                 ),
                 Text(
-                  'Overweight: ',
-                  style: TextStyle(
+                  _resultReading,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                     color: Colors.pinkAccent,
